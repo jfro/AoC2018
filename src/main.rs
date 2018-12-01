@@ -11,13 +11,13 @@ fn main() {
         .arg(
             Arg::with_name("day")
                 .short("d")
-                // .long("day")
+                .long("day")
                 .help("Sets which day puzzle solution to run")
                 .default_value("1"),
         ).arg(
             Arg::with_name("step")
                 .short("s")
-                // .long("step")
+                .long("step")
                 .help("Specifies step to run for selected day puzzle")
                 .default_value("1"),
         ).get_matches();
@@ -25,11 +25,11 @@ fn main() {
     let day = matches.value_of("day").unwrap().parse::<u8>();
     let step = matches.value_of("step").unwrap().parse::<u8>();
 
-    if let Err(_) = day {
+    if day.is_err() {
         println!("Invalid day value: {}", matches.value_of("day").unwrap());
         std::process::exit(1);
     }
-    if let Err(_) = step {
+    if step.is_err() {
         println!("Invalid step value: {}", matches.value_of("step").unwrap());
         std::process::exit(1);
     }
