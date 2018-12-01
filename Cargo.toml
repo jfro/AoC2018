@@ -1,0 +1,16 @@
+[package]
+name = "aoc"
+version = "0.1.0"
+authors = ["Jeremy Knope <jeremy@astro-hq.com>"]
+publish = false
+
+[lib]
+name = "aoc"
+path = "src/lib.rs"
+
+[[bin]]
+name = "aoc"
+path = "src/main.rs"
+
+[dependencies]
+clap = "2.32.0"
