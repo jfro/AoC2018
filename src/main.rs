@@ -22,28 +22,13 @@ fn main() {
                 .default_value("1"),
         ).get_matches();
 
-    let day = matches.value_of("day").unwrap().parse::<u8>();
-    let step = matches.value_of("step").unwrap().parse::<u8>();
+    let day = matches.value_of("day").unwrap();
+    let step = matches.value_of("step").unwrap();
 
-    if day.is_err() {
-        println!("Invalid day value: {}", matches.value_of("day").unwrap());
-        std::process::exit(1);
-    }
-    if step.is_err() {
-        println!("Invalid step value: {}", matches.value_of("step").unwrap());
-        std::process::exit(1);
-    }
-
-    let day = day.unwrap();
-    let step = step.unwrap();
-
-    println!("Running day: {} Step: {}", day, step);
-    match day {
-        1 => {
-            days::day1::run(step);
-        }
-        _ => {
-            println!("Unimplemented day: {}", day);
+    match days::run(day, step) {
+        Ok(_) => {}
+        Err(e) => {
+            println!("Error: {}", e);
             std::process::exit(1);
         }
     }
