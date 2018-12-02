@@ -64,13 +64,13 @@ fn build_id_map() -> HashMap<String, BoxIDType> {
     map
 }
 
-fn step1(map: HashMap<String, BoxIDType>) -> String {
+fn part1(map: HashMap<String, BoxIDType>) -> String {
     let three_count = map.iter().filter(|b| {*b.1 == BoxIDType::Triple || *b.1 == BoxIDType::Both}).count();
     let two_count = map.iter().filter(|b| {*b.1 == BoxIDType::Double || *b.1 == BoxIDType::Both}).count();
     format!("{}", three_count * two_count)
 }
 
-fn step2(map: HashMap<String, BoxIDType>) -> String {
+fn part2(map: HashMap<String, BoxIDType>) -> String {
     for outer in map.keys() {
         for inner in map.keys() {
             if outer == inner {
@@ -86,13 +86,13 @@ fn step2(map: HashMap<String, BoxIDType>) -> String {
     String::from("")
 }
 
-pub fn run(step: u8) -> String {
+pub fn run(part: u8) -> String {
     let map = build_id_map();
-    if step == 2 {
-        step2(map)
+    if part == 2 {
+        part2(map)
     }
     else {
-        step1(map)
+        part1(map)
     }
 }
 
@@ -115,18 +115,18 @@ mod tests {
     }
 
     #[test]
-    fn test_step1() {
+    fn test_part1() {
         use super::*;
         let map = build_id_map();
-        let result = step1(map);
+        let result = part1(map);
         assert_eq!(result, "5727");
     }
 
     #[test]
-    fn test_step2() {
+    fn test_part2() {
         use super::*;
         let map = build_id_map();
-        let result = step2(map);
+        let result = part2(map);
         assert_eq!(result, "uwfmdjxyxlbgnrotcfpvswaqh");
     }
 }

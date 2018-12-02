@@ -15,17 +15,17 @@ fn main() {
                 .help("Sets which day puzzle solution to run")
                 .default_value("1"),
         ).arg(
-            Arg::with_name("step")
-                .short("s")
-                .long("step")
-                .help("Specifies step to run for selected day puzzle")
+            Arg::with_name("part")
+                .short("p")
+                .long("part")
+                .help("Specifies which part of puzzle to run for selected day")
                 .default_value("1"),
         ).get_matches();
 
     let day = matches.value_of("day").unwrap();
-    let step = matches.value_of("step").unwrap();
+    let part = matches.value_of("part").unwrap();
 
-    match days::run(day, step) {
+    match days::run(day, part) {
         Ok(result) => {println!("Answer: {}", result)}
         Err(e) => {
             println!("Error: {}", e);

@@ -5,7 +5,7 @@
 use std::collections::HashMap;
 use crate::utils::lines_for_file;
 
-fn step1() -> String {
+fn part1() -> String {
     let mut freq = 0;
     for line in lines_for_file(1, None) {
         let line = line.unwrap();
@@ -15,7 +15,7 @@ fn step1() -> String {
     format!("{}", freq)
 }
 
-fn step2(frequency: i32, previous: &mut HashMap<i32, i32>) -> (i32, Option<i32>) {
+fn part2(frequency: i32, previous: &mut HashMap<i32, i32>) -> (i32, Option<i32>) {
     let mut frequency = frequency;
     for line in lines_for_file(1, None) {
         let line = line.unwrap();
@@ -30,16 +30,16 @@ fn step2(frequency: i32, previous: &mut HashMap<i32, i32>) -> (i32, Option<i32>)
     (frequency, None)
 }
 
-pub fn run(step: u8) -> String {
-    if step == 1 {
-        return step1();
+pub fn run(part: u8) -> String {
+    if part == 1 {
+        return part1();
     } else {
         let mut mymap: HashMap<i32, i32> = HashMap::new();
         let mut prev_freq = 0;
-        let (f, _) = step2(prev_freq, &mut mymap);
+        let (f, _) = part2(prev_freq, &mut mymap);
         prev_freq = f;
         loop {
-            let (f, dupe) = step2(prev_freq, &mut mymap);
+            let (f, dupe) = part2(prev_freq, &mut mymap);
             prev_freq = f;
             if let Some(d) = dupe {
                 return format!("{}", d);
@@ -50,13 +50,13 @@ pub fn run(step: u8) -> String {
 
 mod tests {
     #[test]
-    fn test_step1() {
+    fn test_part1() {
         use super::*;
         assert_eq!(run(1), "416");
     }
 
     #[test]
-    fn test_step2() {
+    fn test_part2() {
         use super::*;
         assert_eq!(run(2), "56752");
     }
