@@ -2,10 +2,8 @@
 //! https://adventofcode.com/2018/day/2
 //!
 
-use std::fs::File;
-use std::io::prelude::*;
-use std::io::BufReader;
 use std::collections::HashMap;
+use ::utils::lines_for_file;
 
 #[derive(Debug, PartialEq)]
 enum BoxIDType {
@@ -61,22 +59,23 @@ fn difference_count(str1: &str, str2: &str) -> Option<DifferenceResult> {
     None
 }
 
-fn step1() -> HashMap<String, BoxIDType> {
-    let f = File::open("input/day2/input.txt").expect("file not found");
-    let f = BufReader::new(f);
+fn build_id_map() -> HashMap<String, BoxIDType> {
     let mut map: HashMap<String, BoxIDType> = HashMap::new();
-    for line in f.lines() {
+    for line in lines_for_file(2, None) {
         let line = line.unwrap();
         let result = letter_count(&line);
         map.insert(line, result);
     }
-    let three_count = map.iter().filter(|b| {*b.1 == BoxIDType::Triple || *b.1 == BoxIDType::Both}).count();
-    let two_count = map.iter().filter(|b| {*b.1 == BoxIDType::Double || *b.1 == BoxIDType::Both}).count();
-    println!("Step 1 Answer: {}", three_count * two_count);
     map
 }
 
-fn step2(map: HashMap<String, BoxIDType>) {
+fn step1(map: HashMap<String, BoxIDType>) -> String {
+    let three_count = map.iter().filter(|b| {*b.1 == BoxIDType::Triple || *b.1 == BoxIDType::Both}).count();
+    let two_count = map.iter().filter(|b| {*b.1 == BoxIDType::Double || *b.1 == BoxIDType::Both}).count();
+    format!("{}", three_count * two_count)
+}
+
+fn step2(map: HashMap<String, BoxIDType>) -> String {
     for outer in map.keys() {
         for inner in map.keys() {
             if outer == inner {
@@ -85,17 +84,20 @@ fn step2(map: HashMap<String, BoxIDType>) {
             if let Some(result) = difference_count(inner, outer) {
                 let mut test = outer.clone();
                 test.remove(result.location);
-                println!("Step 2 Answer: {:?} (From: {})", test, outer);
-                return;
+                return test;
             }
         }
     }
+    String::from("")
 }
 
-pub fn run(step: u8) {
-    let map = step1();
+pub fn run(step: u8) -> String {
+    let map = build_id_map();
     if step == 2 {
-        step2(map);
+        step2(map)
+    }
+    else {
+        step1(map)
     }
 }
 
@@ -115,5 +117,21 @@ mod tests {
         assert_eq!(difference_count("abcdef", "abcdff"), Some(DifferenceResult { location: 4, count: 1}) );
         assert_eq!(difference_count("bcdef", "abcdff"), None);
         assert_eq!(difference_count("abcdec", "abcdff"), None);
+    }
+
+    #[test]
+    fn test_step1() {
+        use super::*;
+        let map = build_id_map();
+        let result = step1(map);
+        assert_eq!(result, "5727");
+    }
+
+    #[test]
+    fn test_step2() {
+        use super::*;
+        let map = build_id_map();
+        let result = step2(map);
+        assert_eq!(result, "uwfmdjxyxlbgnrotcfpvswaqh");
     }
 }

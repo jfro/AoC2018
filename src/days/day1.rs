@@ -3,27 +3,21 @@
 //!
 
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::prelude::*;
-use std::io::BufReader;
+use ::utils::lines_for_file;
 
-fn step1() {
-    let f = File::open("input/day1/input.txt").expect("file not found");
-    let f = BufReader::new(f);
+fn step1() -> String {
     let mut freq = 0;
-    for line in f.lines() {
+    for line in lines_for_file(1, None) {
         let line = line.unwrap();
         let my_int = line.parse::<i32>().unwrap();
         freq += my_int;
     }
-    println!("Frequency: {}", freq);
+    format!("{}", freq)
 }
 
 fn step2(frequency: i32, previous: &mut HashMap<i32, i32>) -> (i32, Option<i32>) {
-    let f = File::open("input/day1/input.txt").expect("file not found");
-    let f = BufReader::new(f);
     let mut frequency = frequency;
-    for line in f.lines() {
+    for line in lines_for_file(1, None) {
         let line = line.unwrap();
         let my_int = line.parse::<i32>().unwrap();
         frequency += my_int;
@@ -36,9 +30,9 @@ fn step2(frequency: i32, previous: &mut HashMap<i32, i32>) -> (i32, Option<i32>)
     (frequency, None)
 }
 
-pub fn run(step: u8) {
+pub fn run(step: u8) -> String {
     if step == 1 {
-        step1();
+        return step1();
     } else {
         let mut mymap: HashMap<i32, i32> = HashMap::new();
         let mut prev_freq = 0;
@@ -48,9 +42,22 @@ pub fn run(step: u8) {
             let (f, dupe) = step2(prev_freq, &mut mymap);
             prev_freq = f;
             if let Some(d) = dupe {
-                println!("Answer: {}", d);
-                return;
+                return format!("{}", d);
             }
         }
+    }
+}
+
+mod tests {
+    #[test]
+    fn test_step1() {
+        use super::*;
+        assert_eq!(run(1), "416");
+    }
+
+    #[test]
+    fn test_step2() {
+        use super::*;
+        assert_eq!(run(2), "56752");
     }
 }

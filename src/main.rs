@@ -26,7 +26,7 @@ fn main() {
     let step = matches.value_of("step").unwrap();
 
     match days::run(day, step) {
-        Ok(_) => {}
+        Ok(result) => {println!("Answer: {}", result)}
         Err(e) => {
             println!("Error: {}", e);
             std::process::exit(1);

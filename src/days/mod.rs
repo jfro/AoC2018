@@ -1,8 +1,9 @@
 mod day1;
 mod day2;
+mod day3;
 
 /// Runs a solution for given day & step
-pub fn run(day_s: &str, step_s: &str) -> Result<(), String> {
+pub fn run(day_s: &str, step_s: &str) -> Result<String, String> {
     let day = day_s.parse::<u8>();
     let step = step_s.parse::<u8>();
 
@@ -19,12 +20,13 @@ pub fn run(day_s: &str, step_s: &str) -> Result<(), String> {
     println!("Running day: {} Step: {}", day, step);
     match day {
         1 => {
-            day1::run(step);
-            Ok(())
+            Ok(day1::run(step))
         }
         2 => {
-            day2::run(step);
-            Ok(())
+            Ok(day2::run(step))
+        }
+        3 => {
+            Ok(day3::run(step))
         }
         _ => Err(String::from("Unimplemented day")),
     }
