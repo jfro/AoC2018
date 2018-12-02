@@ -5,7 +5,7 @@ use clap::{App, Arg};
 fn main() {
     use aoc::days;
     let matches = App::new("AoC 2018 Runner")
-        .version("1.0")
+        .version("0.1.0")
         .author("Jeremy Knope <me@jeremyknope.com>")
         .about("Manages running AoC 2018 puzzle solutions")
         .arg(
