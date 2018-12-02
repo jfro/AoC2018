@@ -14,25 +14,20 @@ enum BoxIDType {
 }
 
 fn letter_count(id: &str) -> BoxIDType {
-    let mut result = BoxIDType::None;
     let mut map: HashMap<char, u8> = HashMap::new();
     for c in id.chars() {
         let counter = map.entry(c).or_insert(0);
         *counter += 1;
     }
-    for (_, count) in map.iter().filter(|v| {
-        let (_, v) = v;
-        **v == 2 || **v == 3
-    }) {
-        result = match (&result, *count) {
+    map.iter().map(|tuple| tuple.1).fold(BoxIDType::None, |result, count| {
+        match (&result, count) {
             (BoxIDType::None, 2) => BoxIDType::Double,
             (BoxIDType::None, 3) => BoxIDType::Triple,
             (BoxIDType::Double, 3) => BoxIDType::Both,
             (BoxIDType::Triple, 2) => BoxIDType::Both,
             _ => result
         }
-    }
-    result
+    })
 }
 
 #[derive(Debug, PartialEq)]
