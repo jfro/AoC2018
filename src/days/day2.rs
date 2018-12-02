@@ -3,7 +3,7 @@
 //!
 
 use std::collections::HashMap;
-use ::utils::lines_for_file;
+use crate::utils::lines_for_file;
 
 #[derive(Debug, PartialEq)]
 enum BoxIDType {

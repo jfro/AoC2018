@@ -3,7 +3,7 @@
 //!
 
 use std::collections::HashMap;
-use ::utils::lines_for_file;
+use crate::utils::lines_for_file;
 
 fn step1() -> String {
     let mut freq = 0;
