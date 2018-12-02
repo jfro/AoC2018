@@ -37,7 +37,31 @@ fn letter_count(id: &str) -> BoxIDType {
     result
 }
 
-pub fn run(_step: u8) {
+#[derive(Debug, PartialEq)]
+struct DifferenceResult {
+    location: usize,
+    count: usize,
+}
+
+fn difference_count(str1: &str, str2: &str) -> Option<DifferenceResult> {
+    if str1.chars().count() != str2.chars().count() {
+        return None;
+    }
+    let mut count = 0;
+    let mut location = 0;
+    for (i, item) in str1.chars().zip(str2.chars()).enumerate() {
+        if item.0 != item.1 {
+            location = i;
+            count += 1;
+        }
+    }
+    if count == 1 {
+        return Some(DifferenceResult { location, count });
+    }
+    None
+}
+
+fn step1() -> HashMap<String, BoxIDType> {
     let f = File::open("input/day2/input.txt").expect("file not found");
     let f = BufReader::new(f);
     let mut map: HashMap<String, BoxIDType> = HashMap::new();
@@ -48,7 +72,31 @@ pub fn run(_step: u8) {
     }
     let three_count = map.iter().filter(|b| {*b.1 == BoxIDType::Triple || *b.1 == BoxIDType::Both}).count();
     let two_count = map.iter().filter(|b| {*b.1 == BoxIDType::Double || *b.1 == BoxIDType::Both}).count();
-    println!("Answer: {}", three_count * two_count);
+    println!("Step 1 Answer: {}", three_count * two_count);
+    map
+}
+
+fn step2(map: HashMap<String, BoxIDType>) {
+    for outer in map.keys() {
+        for inner in map.keys() {
+            if outer == inner {
+                continue;
+            }
+            if let Some(result) = difference_count(inner, outer) {
+                let mut test = outer.clone();
+                test.remove(result.location);
+                println!("Step 2 Answer: {:?} (From: {})", test, outer);
+                return;
+            }
+        }
+    }
+}
+
+pub fn run(step: u8) {
+    let map = step1();
+    if step == 2 {
+        step2(map);
+    }
 }
 
 mod tests {
@@ -59,5 +107,13 @@ mod tests {
         assert_eq!(letter_count("aabcd"), BoxIDType::Double);
         assert_eq!(letter_count("aaabbcd"), BoxIDType::Both);
         assert_eq!(letter_count("abcdefghijkkkk"), BoxIDType::None);
+    }
+
+    #[test]
+    fn test_diff_count() {
+        use super::*;
+        assert_eq!(difference_count("abcdef", "abcdff"), Some(DifferenceResult { location: 4, count: 1}) );
+        assert_eq!(difference_count("bcdef", "abcdff"), None);
+        assert_eq!(difference_count("abcdec", "abcdff"), None);
     }
 }
