@@ -1,4 +1,5 @@
 use crate::utils::lines_for_file;
+use std::collections::HashSet;
 
 #[derive(Debug, PartialEq)]
 struct Claim {
@@ -7,6 +8,19 @@ struct Claim {
     top: usize,
     width: usize,
     height: usize,
+}
+struct RegisteredClaims {
+    claims: Vec<usize>,
+    count: usize,
+}
+
+impl RegisteredClaims {
+    fn new() -> RegisteredClaims {
+        RegisteredClaims {
+            claims: Vec::new(),
+            count: 0,
+        }
+    }
 }
 
 impl Claim {
@@ -17,16 +31,6 @@ impl Claim {
     fn bottom(&self) -> usize {
         self.top + self.height
     }
-
-    // fn intersects(&self, other: &Claim) -> bool {
-    //     if other.left >= self.right() || self.left >= other.right() {
-    //         return false;
-    //     }
-    //     if other.bottom() <= self.top || self.bottom() <= other.top {
-    //         return false;
-    //     }
-    //     return true;
-    // }
 }
 
 fn generate_claim(string: &str) -> Option<Claim> {
@@ -47,7 +51,7 @@ fn generate_claim(string: &str) -> Option<Claim> {
     })
 }
 
-fn part1() -> String {
+fn generate_claims() -> Vec<Claim> {
     let mut claims: Vec<Claim> = Vec::new();
     for line in lines_for_file(3, Some("input.txt")) {
         let line = line.unwrap();
@@ -58,58 +62,69 @@ fn part1() -> String {
             println!("Failed to generate claim: {}", line);
         }
     }
-
-    let mut grid: Vec<Vec<i32>> = Vec::new();
-
-    for claim in claims {
-
-            // pad before claim if not there yet
-            for _ in grid.len()..claim.top {
-                grid.push(Vec::new());
-            }
-            for row in claim.top..claim.bottom() {
-                // add row if missing
-                if row >= grid.len() {
-                    grid.push(Vec::new());
-                }
-                // pad x
-                for _ in grid[row].len()..claim.left {
-                    grid[row].push(0);
-                }
-                for col in claim.left..claim.right() {
-                    if col >= grid[row].len() {
-                        grid[row].push(0);
-                    }
-                    grid[row][col] += 1;
-                }
-            }
-
-    }
-    // println!("{:?}", grid);
-    // for y in grid.iter() {
-    //     for x in y.iter() {
-    //         print!("{}", x);
-    //     }
-    //     println!("");
-    // }
-
-    let row_check = grid.iter().map(|row| {
-        row.iter().filter(|count| **count > 1).count() as u32
-    }).fold(0, |acc, x| acc + x);
-
-    format!("{}", row_check)
+    claims
 }
 
-fn part2() -> String {
-    String::from("Unfinished")
+fn generate_grid(claims: &Vec<Claim>) -> (Vec<Vec<RegisteredClaims>>, HashSet<usize>) {
+    let mut invalid_claims: HashSet<usize> = HashSet::new();
+    let mut grid: Vec<Vec<RegisteredClaims>> = Vec::new();
+
+    for claim in claims {
+        // pad before claim if not there yet
+        for _ in grid.len()..claim.top {
+            grid.push(Vec::new());
+        }
+        for row in claim.top..claim.bottom() {
+            // add row if missing
+            if row >= grid.len() {
+                grid.push(Vec::new());
+            }
+            // pad x
+            for _ in grid[row].len()..claim.left {
+                grid[row].push(RegisteredClaims::new());
+            }
+            for col in claim.left..claim.right() {
+                if col >= grid[row].len() {
+                    grid[row].push(RegisteredClaims::new());
+                }
+                grid[row][col].claims.push(claim.id);
+                grid[row][col].count += 1;
+                if grid[row][col].count > 1 {
+                    // add claims that overlap to our list of invalid ones for part 2
+                    for claim in &grid[row][col].claims {
+                        invalid_claims.insert(*claim);
+                    }
+                }
+            }
+        }
+    }
+    (grid, invalid_claims)
+}
+
+fn part1(grid: Vec<Vec<RegisteredClaims>>) -> String {
+    let total_overlap = grid.iter().map(|row| {
+        row.iter().filter(|rc| rc.count > 1).count() as u32
+    }).fold(0, |acc, x| acc + x);
+
+    format!("{}", total_overlap)
+}
+
+fn part2(claims: Vec<Claim>, invalid_claims: HashSet<usize>) -> String {
+    let results: Vec<usize> = claims.iter().filter(|c| {
+        !invalid_claims.contains(&c.id)
+    }).map(|c| c.id).collect();
+    // we'd crash if this failed... but it shouldn't for this puzzle :)
+    format!("{}", results[0])
 }
 
 pub fn run(part: u8) -> String {
+    let claims = generate_claims();
+    let (grid, invalid_claims) = generate_grid(&claims);
     if part == 2 {
-        part2()
+        part2(claims, invalid_claims)
     }
     else {
-        part1()
+        part1(grid)
     }
 }
 
@@ -121,23 +136,12 @@ mod tests {
         assert_eq!(Claim { id: 234, left: 3, top: 1235, width: 234, height: 1245 }, generate_claim("#234 @ 3,1235: 234x1245").unwrap());
     }
 
-    // #[test]
-    // fn test_intersects() {
-    //     use super::*;
-    //     let c1 = Claim { id: 1, left: 4, top: 4, width: 4, height: 4 };
-    //     let c2 = Claim { id: 2, left: 1, top: 1, width: 4, height: 4 };
-    //     assert!(c1.intersects(&c2));
-
-    //     let c1 = Claim { id: 1, left: 4, top: 4, width: 4, height: 4 };
-    //     let c2 = Claim { id: 2, left: 1, top: 0, width: 4, height: 4 };
-    //     assert!(!c1.intersects(&c2));
-
-    //     let c1 = Claim { id: 1, left: 4, top: 4, width: 4, height: 4 };
-    //     let c2 = Claim { id: 2, left: 8, top: 0, width: 4, height: 4 };
-    //     assert!(!c1.intersects(&c2));
-
-    //     let c1 = Claim { id: 1, left: 4, top: 4, width: 4, height: 4 };
-    //     let c2 = Claim { id: 2, left: 7, top: 1, width: 4, height: 4 };
-    //     assert!(c1.intersects(&c2));
-    // }
+    #[test]
+    fn test_parts() {
+        use super::*; // docs claim i can put this in mod level, but it produces warnings there
+        let claims = generate_claims();
+        let (grid, invalid_claims) = generate_grid(&claims);
+        assert_eq!(part1(grid), "110389");
+        assert_eq!(part2(claims, invalid_claims), "552");
+    }
 }
