@@ -48,16 +48,17 @@ pub fn run(part: u8) -> String {
     }
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_part1() {
-        use super::*;
         assert_eq!(run(1), "416");
     }
 
     #[test]
     fn test_part2() {
-        use super::*;
         assert_eq!(run(2), "56752");
     }
 }

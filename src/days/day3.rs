@@ -9,19 +9,6 @@ struct Claim {
     width: usize,
     height: usize,
 }
-struct RegisteredClaims {
-    claims: Vec<usize>,
-    count: usize,
-}
-
-impl RegisteredClaims {
-    fn new() -> RegisteredClaims {
-        RegisteredClaims {
-            claims: Vec::new(),
-            count: 0,
-        }
-    }
-}
 
 impl Claim {
     fn right(&self) -> usize {
@@ -65,9 +52,9 @@ fn generate_claims() -> Vec<Claim> {
     claims
 }
 
-fn generate_grid(claims: &Vec<Claim>) -> (Vec<Vec<RegisteredClaims>>, HashSet<usize>) {
+fn generate_grid(claims: &Vec<Claim>) -> (Vec<Vec<Vec<usize>>>, HashSet<usize>) {
     let mut invalid_claims: HashSet<usize> = HashSet::new();
-    let mut grid: Vec<Vec<RegisteredClaims>> = Vec::new();
+    let mut grid: Vec<Vec<Vec<usize>>> = Vec::new();
 
     for claim in claims {
         // pad before claim if not there yet
@@ -81,17 +68,17 @@ fn generate_grid(claims: &Vec<Claim>) -> (Vec<Vec<RegisteredClaims>>, HashSet<us
             }
             // pad x
             for _ in grid[row].len()..claim.left {
-                grid[row].push(RegisteredClaims::new());
+                grid[row].push(Vec::new());
             }
             for col in claim.left..claim.right() {
                 if col >= grid[row].len() {
-                    grid[row].push(RegisteredClaims::new());
+                    grid[row].push(Vec::new());
                 }
-                grid[row][col].claims.push(claim.id);
-                grid[row][col].count += 1;
-                if grid[row][col].count > 1 {
+                grid[row][col].push(claim.id);
+                // grid[row][col].count += 1;
+                if grid[row][col].len() > 1 {
                     // add claims that overlap to our list of invalid ones for part 2
-                    for claim in &grid[row][col].claims {
+                    for claim in &grid[row][col] {
                         invalid_claims.insert(*claim);
                     }
                 }
@@ -101,20 +88,20 @@ fn generate_grid(claims: &Vec<Claim>) -> (Vec<Vec<RegisteredClaims>>, HashSet<us
     (grid, invalid_claims)
 }
 
-fn part1(grid: Vec<Vec<RegisteredClaims>>) -> String {
-    let total_overlap = grid.iter().map(|row| {
-        row.iter().filter(|rc| rc.count > 1).count() as u32
-    }).fold(0, |acc, x| acc + x);
-
+fn part1(grid: Vec<Vec<Vec<usize>>>) -> String {
+    let total_overlap: usize = grid.iter().map(|row| {
+        row.iter().filter(|rc| rc.len() > 1).count()
+    }).sum();
+    
     format!("{}", total_overlap)
 }
 
 fn part2(claims: Vec<Claim>, invalid_claims: HashSet<usize>) -> String {
-    let results: Vec<usize> = claims.iter().filter(|c| {
+    let results = claims.iter().filter(|c| {
         !invalid_claims.contains(&c.id)
-    }).map(|c| c.id).collect();
+    }).map(|c| c.id).next();
     // we'd crash if this failed... but it shouldn't for this puzzle :)
-    format!("{}", results[0])
+    format!("{}", results.unwrap())
 }
 
 pub fn run(part: u8) -> String {
@@ -128,17 +115,18 @@ pub fn run(part: u8) -> String {
     }
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;    
+
     #[test]
-    fn test_generate_claim() {
-        use super::*;    
+    fn test_generate_claim() {    
         assert_eq!(Claim { id: 1, left: 1, top: 3, width: 4, height: 4 }, generate_claim("#1 @ 1,3: 4x4").unwrap());
         assert_eq!(Claim { id: 234, left: 3, top: 1235, width: 234, height: 1245 }, generate_claim("#234 @ 3,1235: 234x1245").unwrap());
     }
 
     #[test]
     fn test_parts() {
-        use super::*; // docs claim i can put this in mod level, but it produces warnings there
         let claims = generate_claims();
         let (grid, invalid_claims) = generate_grid(&claims);
         assert_eq!(part1(grid), "110389");

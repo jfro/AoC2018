@@ -1,6 +1,6 @@
-mod day1;
-mod day2;
-mod day3;
+pub mod day1;
+pub mod day2;
+pub mod day3;
 
 /// Runs a solution for given day & part
 pub fn run(day_s: &str, part_s: &str) -> Result<String, String> {

@@ -96,10 +96,12 @@ pub fn run(part: u8) -> String {
     }
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_char_count() {
-        use super::*;
         assert_eq!(letter_count("aaabcd"), BoxIDType::Triple);
         assert_eq!(letter_count("aabcd"), BoxIDType::Double);
         assert_eq!(letter_count("aaabbcd"), BoxIDType::Both);
@@ -108,7 +110,6 @@ mod tests {
 
     #[test]
     fn test_diff_count() {
-        use super::*;
         assert_eq!(difference_count("abcdef", "abcdff"), Some(DifferenceResult { location: 4, count: 1}) );
         assert_eq!(difference_count("bcdef", "abcdff"), None);
         assert_eq!(difference_count("abcdec", "abcdff"), None);
@@ -116,7 +117,6 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        use super::*;
         let map = build_id_map();
         let result = part1(map);
         assert_eq!(result, "5727");
@@ -124,7 +124,6 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        use super::*;
         let map = build_id_map();
         let result = part2(map);
         assert_eq!(result, "uwfmdjxyxlbgnrotcfpvswaqh");
