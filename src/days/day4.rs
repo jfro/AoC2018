@@ -105,7 +105,30 @@ fn generate_events(lines: Vec<String>) -> Vec<GuardEvent> {
 
 // -----
 
-fn part1() -> String {
+fn find_next_best_guard(guard_map: &HashMap<u32, [u32; 60]>) -> String {
+    let mut best_id = 0;
+    let mut best_count = 0;
+    for (&guard_id, mins) in guard_map.iter() {
+        let &max = mins.iter().max().unwrap();
+        if max > best_count {
+            best_id = guard_id;
+            best_count = max;
+        }
+    }
+    // println!("Found: {} at {}", best_id, best_count);
+    let mut best_min = 0;
+    let mut best_count = 0;
+    for (min, &count) in guard_map[&best_id].iter().enumerate() {
+        if count > best_count {
+            best_min = min as u8;
+            best_count = count;
+        }
+    }
+    // println!("Found: {} at {}", best_id, best_min);
+    format!("{}", best_id * best_min as u32)
+}
+
+fn find_sleepy_guard() -> (u32, u8, HashMap<u32, [u32; 60]>) {
     let mut line_strings: Vec<String> = Vec::new();
     for line in lines_for_file(4, Some("input.txt")) {
         if let Ok(line) = line {
@@ -159,27 +182,29 @@ fn part1() -> String {
     let mut best_count = 0;
     for (min, &count) in guard_map[&found_id].iter().enumerate() {
         if count > best_count {
-            best_min = min as u32;
+            best_min = min as u8;
             best_count = count;
         }
     }
     // println!("Best min: {}", best_min);
-    format!("{}", best_min * found_id)
-}
-
-fn part2() -> String {
-    String::from("unfinished")
+    (found_id, best_min, guard_map)
 }
 
 pub fn run(part: u8) -> String {
+    let (guard_id, best_min, guard_map) = find_sleepy_guard();
     if part == 2 {
-        part2()
+        find_next_best_guard(&guard_map)
     } else {
-        part1()
+        format!("{}", best_min as u32 * guard_id)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn test_part1() {
+        let (guard_id, best_min, _guard_map) = find_sleepy_guard();
+        assert_eq!(guard_id * best_min as u32, 50558);
+    }
 }
