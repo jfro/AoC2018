@@ -9,7 +9,7 @@ My attempts at solving Advent of Code 2018 puzzles in Rust.
 - [Day 1](src/days/day1.rs)
 - [Day 2](src/days/day2.rs)
 - [Day 3](src/days/day3.rs)
-- Day 4
+- [Day 4](src/days/day4.rs)
 - Day 5
 - Day 6
 - Day 7
