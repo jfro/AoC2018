@@ -1,6 +1,7 @@
 use crate::utils::lines_for_file;
 use std::collections::HashMap;
 use regex::Regex;
+use lazy_static::lazy_static;
 
 #[derive(Debug, PartialEq)]
 enum GuardStatus {
@@ -30,10 +31,9 @@ struct GuardEvent {
     id: u32,
     state: GuardStatus,
 }
-// -----
 
-fn generate_event(line: &str, guard_id: Option<u32>) -> Option<GuardEvent> {
-        let re = Regex::new(r"(?x)
+lazy_static! {
+    static ref LINE_RE: Regex = Regex::new(r"(?x)
 \[(?P<year>\d{4})  # the year
 -
 (?P<month>\d{2}) # the month
@@ -44,7 +44,22 @@ fn generate_event(line: &str, guard_id: Option<u32>) -> Option<GuardEvent> {
 \s(Guard\s\#(\d*))?
 ([\s\w]+)?
 ").unwrap();
-    let caps = re.captures(line).unwrap();
+}
+// -----
+
+fn generate_event(line: &str, guard_id: Option<u32>) -> Option<GuardEvent> {
+//         let re = Regex::new(r"(?x)
+// \[(?P<year>\d{4})  # the year
+// -
+// (?P<month>\d{2}) # the month
+// -
+// (?P<day>\d{2})   # the day
+// \s(?P<hour>\d{2}) # hour
+// :(?P<min>\d{2})\]   # min
+// \s(Guard\s\#(\d*))?
+// ([\s\w]+)?
+// ").unwrap();
+    let caps = LINE_RE.captures(line).unwrap();
     let date = Date { 
         year: caps["year"].parse::<u16>().unwrap(),
         month: caps["month"].parse::<u8>().unwrap(),
@@ -103,19 +118,20 @@ fn part1() -> String {
     let mut guard_map: HashMap<u32, [u32; 60]> = HashMap::new();
     let mut sleep_start: Option<u8> = None;
     for event in events.iter() {
+        // println!("Event: {:?}", event);
         if event.state == GuardStatus::Asleep {
             sleep_start = Some(event.time.minute);
         }
         else if event.state == GuardStatus::Awake {
             if let Some(sleep_start) = sleep_start  {
                 let range = sleep_start..event.time.minute;
+                let mins = guard_map.entry(event.id).or_insert([0; 60]);
                 for min in range {
-                    let mins = guard_map.entry(event.id).or_insert([0; 60]);
                     mins[min as usize] += 1;
                 }
             }
             else {
-                panic!("Awoke without a sleep");
+                panic!("Awoke without a sleep: {:?}", event);
             }
             sleep_start = None;
         }
@@ -138,15 +154,17 @@ fn part1() -> String {
             found_id = *id;
         }
     }
-    println!("{} with {}", found_id, most_mins);
+    // println!("{} with {}", found_id, most_mins);
     let mut best_min = 0;
+    let mut best_count = 0;
     for (min, &count) in guard_map[&found_id].iter().enumerate() {
-        if count > 1 {
-            best_min = min;
+        if count > best_count {
+            best_min = min as u32;
+            best_count = count;
         }
     }
-    println!("Best min: {}", best_min);
-    format!("{}", best_min * found_id as usize)
+    // println!("Best min: {}", best_min);
+    format!("{}", best_min * found_id)
 }
 
 fn part2() -> String {
