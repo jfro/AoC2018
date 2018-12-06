@@ -1,7 +1,6 @@
 use crate::utils::lines_for_file;
 use std::collections::HashMap;
 use regex::Regex;
-use std::cmp::{PartialOrd, Ordering};
 
 #[derive(Debug, PartialEq)]
 enum GuardStatus {
@@ -9,12 +8,6 @@ enum GuardStatus {
     Awake,
     Asleep,
     Unknown,
-}
-
-// #[derive(Debug)]
-struct GuardSleepInfo {
-    id: u32,
-    midnight_status: [GuardStatus; 60],
 }
 
 #[derive(Debug)]
@@ -29,15 +22,6 @@ struct Time {
     hour: u8,
     minute: u8,
 }
-
-// impl PartialOrd for Time {
-//     fn partial_cmp(&self, other: &Time) -> Option<Ordering> {
-//         if self.hour == other.hour {
-//             return self.minute.partial_cmp(other.minute);
-//         }
-
-//     }
-// }
 
 #[derive(Debug)]
 struct GuardEvent {
