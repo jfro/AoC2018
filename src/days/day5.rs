@@ -2,7 +2,7 @@ use crate::utils::lines_for_file;
 
 fn replace_reactions(string: &mut String) -> bool {
     let mut iter = string.chars().enumerate().peekable();
-    // let mut replace_indices: Vec<usize> = Vec::new();
+    let mut replace_indices: Vec<usize> = Vec::new();
     while let Some((i, c)) = iter.next() {
         if let Some((_, next_c)) = iter.peek() {
             let first = c as u8;
@@ -10,35 +10,41 @@ fn replace_reactions(string: &mut String) -> bool {
             if first > second {
                 if first - second == 32 {
                     // print!("{}{} ", c, next_c);
-                    // replace_indices.push(i);
-                    // iter.next();
-                    let r = i..(i+2);
-                    string.replace_range(r, "");
-                    return true
+                    replace_indices.push(i);
+                    iter.next();
+                    // let r = i..(i+2);
+                    // string.replace_range(r, "");
+                    // return true
                 }
             }
             else if second > first {
                 if second - first == 32 {
                     // print!("{}{} ", c, next_c);
-                    // replace_indices.push(i);
-                    // iter.next();
-                    let r = i..(i+2);
-                    string.replace_range(r, "");
-                    return true
+                    replace_indices.push(i);
+                    iter.next();
+                    // let r = i..(i+2);
+                    // string.replace_range(r, "");
+                    // return true
                 }
             }
             
         }
     }
-    // let will_replace = replace_indices.len() > 0;
-    // // println!("Indices: {:?}", replace_indices);
-    // for index in replace_indices {
-    //     let r = index..(index+2);
-    //     string.replace_range(r, "");
-    //     println!("Result: {}", string);
-    // }
-    // will_replace
-    false
+    let mut offset = 0;
+    let will_replace = replace_indices.len() > 0;
+    // println!("Indices: {:?}", replace_indices);
+    for index in replace_indices {
+        // if offset > index {
+        //     panic!("Offset too big: {} > {}", offset, index);
+        // }
+        let adjusted_index = index - offset;
+        let r = adjusted_index..(adjusted_index+2);
+        string.replace_range(r, "");
+        offset = offset + 2;
+        // println!("Result: {}", string);
+    }
+    will_replace
+    // false
 }
 fn process_string(mut string: String) -> String {
     // loop until no more replacements happen
@@ -55,8 +61,8 @@ pub fn run(part: u8) -> String {
     if part == 2 {
         part2()
     } else {
-        let line = lines_for_file(5, None).next().unwrap();
-        format!("{}", process_string(line.unwrap()).len())
+        let line = lines_for_file(5, None).next().unwrap().unwrap();
+        format!("{}", process_string(line).len())
     }
 }
 
@@ -76,5 +82,10 @@ mod tests {
         let test = String::from("dabAcCaCBAcCcaDA");
         let result = process_string(test);
         assert_eq!(result, "dabCBAcaDA");
+    }
+
+    #[test]
+    fn test_part1() {
+        assert_eq!(run(1), "10762");
     }
 }
