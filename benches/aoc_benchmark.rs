@@ -28,7 +28,7 @@ fn bench_day4(c: &mut Criterion) {
 }
 
 fn bench_day5(c: &mut Criterion) {
-    c.bench_function("day 5 part 1", |b| b.iter(|| days::day5::run(1)));
+    c.bench_function("day 5 part 1", |b| b.iter(|| days::day5::bench(1)));
     // c.bench_function("day 5 part 2", |b| b.iter(|| days::day5::run(2)));
 }
 
