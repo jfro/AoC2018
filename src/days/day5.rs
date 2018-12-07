@@ -54,7 +54,13 @@ fn process_string(mut string: String) -> String {
 }
 
 fn part2() -> String {
-    String::from("unfinished")
+    let line = lines_for_file(5, None).next().unwrap().unwrap();
+    let alphabet = ('a' as u8)..('z' as u8);
+    let result = alphabet.map(|c| {
+        let result = line.replace(c as char, "").replace((c - 32) as char, "");
+        process_string(result).len()
+    }).min().unwrap();
+    format!("{}", result)
 }
 
 pub fn run(part: u8) -> String {
